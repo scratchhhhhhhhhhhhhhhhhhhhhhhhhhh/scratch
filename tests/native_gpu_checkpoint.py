@@ -14,7 +14,7 @@ from native_initramfs import initramfs
 
 def main():
     config=Path('kernel-artifact/kernel.config').read_text()
-    required=['VIRTIO_GPU','DRM','DRM_VIRTIO_GPU']
+    required=['DRM','DRM_VIRTIO_GPU']
     missing=[name for name in required if f'CONFIG_{name}=y' not in config]
     if missing:
         raise RuntimeError(f'GPU acceptance requires the virtio-gpu DRM kernel: missing {missing}')
