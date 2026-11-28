@@ -39,6 +39,17 @@ def main():
         Path('display-checkpoint.json').write_text(json.dumps({'verified':False,'samples':samples},indent=2))
         print(json.dumps(sample,indent=2),flush=True)
         assert p.returncode==0,(p.stderr,serial[-3500:])
+        # Pixel-level diagnostics for CI debugging when exact_pixels is false.
+        if pixels!=reference:
+            diag=[]
+            diag.append(f'capture_len={len(pixels)} ref_len={len(reference)}')
+            diag.append(f'capture[:64]={pixels[:64]!r}')
+            diag.append(f'ref    [:64]={reference[:64]!r}')
+            for i in range(min(len(pixels),len(reference))):
+                if pixels[i]!=reference[i]:
+                    diag.append(f'first_diff_at={i} capture={pixels[i]:#04x} ref={reference[i]:#04x}')
+                    break
+            Path('display-diag.txt').write_text('\n'.join(diag)+'\n')
         player=json.loads(next(line.split('=',1)[1] for line in p.stdout.splitlines() if line.startswith('NATIVE_PLAYER_JSON=')))
         # Independently derive BGRX data actually submitted to GDI from RGB reference.
         rgb=reference.split(b'\n',3)[3]
