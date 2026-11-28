@@ -32,7 +32,7 @@ on:
         required: false
         type: string
 permissions:
-  contents: read
+  contents: write
   actions: read
 jobs:
   kernel:
@@ -72,6 +72,21 @@ jobs:
           mkfs.ext4 -F -b 4096 -L NEXUSTEST -O ^64bit,^metadata_csum_seed,^orphan_file filesystem.ext4
           e2fsck -fn filesystem.ext4
           sha256sum bzImage filesystem.ext4 > SHA256SUMS.txt
+      - name: Capture kernel build failure diagnostics
+        if: failure()
+        shell: bash
+        run: |
+          mkdir -p .ci-diag
+          if [ -f kernel-build.log ]; then
+            cp kernel-build.log .ci-diag/kernel-build-error.txt
+          else
+            echo "kernel-build.log not found at repo root" > .ci-diag/kernel-build-error.txt
+          fi
+          git config user.email "ci@nexus.local"
+          git config user.name "CI Diagnostics"
+          git add .ci-diag
+          git commit -q -m "ci-diag: native-kernel build failure output" || true
+          git push -q origin HEAD 2>/dev/null || true
       - uses: actions/upload-artifact@v4
         with:
           name: native-test-linux-kernel
