@@ -1,14 +1,41 @@
 RETURN=101
 STDOUT:
    Compiling nexus-engine v0.1.0 (D:\a\scratch\scratch\rust\nexus-engine)
-    Finished `test` profile [unoptimized + debuginfo] target(s) in 20.08s
+warning: unnecessary parentheses around assigned value
+   --> src\whp_mmio.rs:116:28
+    |
+116 |         let in_framebuffer=(a.gpa>=crate::framebuffer::GPA&&end<=(crate::framebuffer::GPA+crate::framebuffer::MAPPED_BYTES as u64));
+    |                            ^                                                                                                      ^
+    |
+    = note: `#[warn(unused_parens)]` (part of `#[warn(unused)]`) on by default
+help: remove these parentheses
+    |
+116 -         let in_framebuffer=(a.gpa>=crate::framebuffer::GPA&&end<=(crate::framebuffer::GPA+crate::framebuffer::MAPPED_BYTES as u64));
+116 +         let in_framebuffer=a.gpa>=crate::framebuffer::GPA&&end<=(crate::framebuffer::GPA+crate::framebuffer::MAPPED_BYTES as u64);
+    |
+
+warning: unnecessary parentheses around assigned value
+   --> src\whp_mmio.rs:117:21
+    |
+117 |         let in_mmio=(a.gpa>=MMIO_BASE&&end<=MMIO_BASE+8*4096);
+    |                     ^                                       ^
+    |
+help: remove these parentheses
+    |
+117 -         let in_mmio=(a.gpa>=MMIO_BASE&&end<=MMIO_BASE+8*4096);
+117 +         let in_mmio=a.gpa>=MMIO_BASE&&end<=MMIO_BASE+8*4096;
+    |
+
+warning: `nexus-engine` (lib) generated 2 warnings (run `cargo fix --lib -p nexus-engine` to apply 2 suggestions)
+warning: `nexus-engine` (lib test) generated 2 warnings (2 duplicates)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 18.99s
      Running unittests src\lib.rs (rust\nexus-engine\target\debug\build\nexus-engine/6eeb0d3c744f3473\out\nexus_engine-6eeb0d3c744f3473.exe)
 
-running 186 tests
-test ata::tests::reset_slave_and_corrupt_images ... ok
+running 187 tests
+test ata::tests::identify_capacity_and_pio_sector_data_not_container_header ... ok
 test ata::tests::write_dma_and_bounds_refused_and_source_unchanged ... ok
 test boot::tests::requires_boot_signature ... ok
-test ata::tests::identify_capacity_and_pio_sector_data_not_container_header ... ok
+test bridge::tests::apk_stream_is_binary_safe_acknowledged_and_not_complete_until_verification ... ok
 test bridge::tests::backpressure_does_not_overwrite_receiver ... ok
 test bridge::tests::fragmented_greeting_query_and_result_not_home_or_install_success ... ok
 test bridge::tests::hardware_irq_probe_preface_is_bounded_and_not_allowed_after_greeting ... ok
@@ -24,8 +51,8 @@ test cpu::tests::protected_start_state ... ok
 test cpu::tests::protection_fixture_enables_wp_and_keeps_fault_targets_unmapped_or_readonly ... ok
 test cpu::tests::transition_tables_and_real_entry_are_independent_of_seeded_long_state ... ok
 test firmware::tests::mp_layout_checksum_and_routes_match_machine_for_all_cpu_counts ... ok
-test bridge::tests::apk_stream_is_binary_safe_acknowledged_and_not_complete_until_verification ... ok
-test ata::tests::cow_guest_words_persist_and_partial_sector_is_discarded_on_reset ... ok
+test ata::tests::reset_slave_and_corrupt_images ... ok
+test framebuffer::tests::capture_refuses_overwrite ... ok
 test framebuffer::tests::screen_info_and_reserved_surface ... ok
 test gpio::tests::byte_and_word_access_masks ... ok
 test gpio::tests::direction_output_input_roundtrip ... ok
@@ -44,10 +71,11 @@ test i2c::tests::status_is_read_only ... ok
 test i2c::tests::unsupported_offsets_and_sizes ... ok
 test framebuffer::tests::exact_rgb_channels_ignore_x_and_mapping_padding ... ok
 test image::tests::crc_vector ... ok
+test ata::tests::cow_guest_words_persist_and_partial_sector_is_discarded_on_reset ... ok
 test image::tests::renamed_containers_refused ... ok
-test image::tests::corruption_rejected ... ok
 test io::tests::bus_is_private_and_bounded ... ok
 test io::tests::decode_and_width_rules ... ok
+test ata::tests::zero_count_means_256_sectors_and_upper_rax_is_preserved ... ok
 test io::tests::reject_unsupported_contexts ... ok
 test ioapic::tests::edge_logical_polarity_and_validation ... ok
 test ioapic::tests::level_remote_irr_eoi_reassert_and_mask ... ok
@@ -57,6 +85,7 @@ test kernel::tests::audio_probe_requires_single_vcpu_platform_path ... ok
 test kernel::tests::boot_params_and_layout ... ok
 test kernel::tests::bounds_and_initrd_collision ... ok
 test kernel::tests::clock_handoff_uses_actual_frequency_and_preserves_command_prefix ... ok
+test kernel::tests::gpu_probe_requires_single_vcpu_platform_path ... ok
 test kernel::tests::hardware_renderer_is_refused_at_validation ... ok
 test kernel::tests::larger_ram_e820_initrd_and_mmio_separation ... ok
 test kernel::tests::malformed_headers_refused ... ok
@@ -64,18 +93,17 @@ test kernel::tests::net_probe_requires_single_vcpu_platform_path ... ok
 test kernel::tests::nonrelocatable_runtime_is_separate_from_compressed_load ... ok
 test kernel::tests::overlap_validation ... ok
 test kernel::tests::real_audio_backend_requires_audio_probe ... ok
-test kernel::tests::selected_cpu_count_requires_matching_boot_profile ... ok
 test kernel::tests::software_renderer_validates ... ok
-test ata::tests::zero_count_means_256_sectors_and_upper_rax_is_preserved ... ok
+test kernel::tests::selected_cpu_count_requires_matching_boot_profile ... ok
 test lapic::tests::disabled_masked_priority_and_deferred_acknowledgement ... ok
 test lapic::tests::edge_coalescing_and_invalid_registers_leave_requests_intact ... ok
+test image::tests::corruption_rejected ... ok
 test lapic::tests::flat_logical_destinations_and_mode_validation ... ok
 test lapic::tests::nested_higher_priority_and_same_class_waits_for_eoi ... ok
 test lapic::tests::physical_destination_and_shorthand_do_not_touch_other_cpus ... ok
 test lapic::tests::timer_all_dividers_and_disabled_apic ... ok
 test lapic::tests::timer_countdown_periodic_masking_and_reprogramming ... ok
 test lapic::tests::trigger_mode_tracks_acknowledged_vector_and_clears_on_eoi ... ok
-test framebuffer::tests::capture_refuses_overwrite ... ok
 test lapic::tests::cr8_priority_classes_preserve_subpriority_and_defer_without_losing_irr ... ok
 test image::tests::round_trip_bounds_and_no_overwrite ... ok
 test overlay::tests::host_write_failure_poisoning_preserves_committed_data ... ok
@@ -86,7 +114,7 @@ test pic::tests::auto_eoi_does_not_block_subsequent_edges_and_reinitialization_r
 test pic::tests::dedicated_level_irq_mask_ack_eoi_reassert_and_deassert ... ok
 test pic::tests::irq0_preempts_irq5_but_lower_priority_waits_for_eoi ... ok
 test pic::tests::irq5_edge_mode_and_elcr_restrictions ... ok
-test overlay::tests::single_writer_no_overwrite_and_bounds ... ok
+test pic::tests::irq8_slave_cascade_delivery_and_ack ... ok
 test pic::tests::linux_cascaded_initialization_and_register_reads ... ok
 test pic::tests::masked_pending_in_service_eoi_and_coalescing ... ok
 test pic::tests::masks_roundtrip_and_reset ... ok
@@ -119,7 +147,7 @@ test player::tests::snapshots_are_owned_and_bounded ... ok
 test rtc::tests::disabled_alarm_register_storage_never_claims_an_interrupt ... ok
 test rtc::tests::update_window_nmi_shadow_and_strict_modes ... ok
 test rtc::tests::utc_epoch_leap_date_and_rollover ... ok
-test pic::tests::irq8_slave_cascade_delivery_and_ack ... FAILED
+test overlay::tests::single_writer_no_overwrite_and_bounds ... ok
 test spi::tests::clock_divider_and_mode_roundtrip ... ok
 test spi::tests::enable_and_transfer ... ok
 test spi::tests::no_transfer_when_disabled ... ok
@@ -184,33 +212,55 @@ test virtio_net::tests::tx_rejects_short_packet_and_wrong_direction ... ok
 test virtio_net::tests::tx_strips_header_transmits_and_completes_with_status ... ok
 test virtio_net_mmio::tests::mac_config_is_readable_from_config_space ... ok
 test virtio_net_mmio::tests::notify_before_driver_ok_is_rejected ... ok
-test overlay::tests::wrong_base_and_header_refused_without_mutating_overlay ... ok
 test virtio_net_mmio::tests::rx_notify_service_delivers_loopback_frame ... ok
 test virtio_net_mmio::tests::status_negotiation_requires_ack_driver_features_then_ok ... ok
-test virtio_block_tests::actual_cow_backend_write_flush_reopen_and_base_preservation ... ok
 test virtio_net_mmio::tests::tx_notify_service_and_irq ... ok
 test virtqueue::tests::indices_wrap_without_replaying_or_losing_a_descriptor ... ok
+test overlay::tests::wrong_base_and_header_refused_without_mutating_overlay ... ok
+test virtio_block_tests::actual_cow_backend_write_flush_reopen_and_base_preservation ... ok
 test virtio_mmio_tests::mmio_model_cow_write_flush_reset_reopen_read_preserves_base ... ok
 
-failures:
+test result: ok. 187 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.58s
 
----- pic::tests::irq8_slave_cascade_delivery_and_ack stdout ----
+     Running unittests src\main.rs (rust\nexus-engine\target\debug\build\nexus-engine/2d847dd113b5de05\out\nexus_engine-2d847dd113b5de05.exe)
 
-thread 'pic::tests::irq8_slave_cascade_delivery_and_ack' (3712) panicked at src\pic.rs:226:9:
-assertion `left == right` failed
-  left: None
- right: Some(34)
-note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
 
 
-failures:
-    pic::tests::irq8_slave_cascade_delivery_and_ack
+    Checking nexus-engine v0.1.0 (D:\a\scratch\scratch\rust\nexus-engine)
+error: unnecessary parentheses around assigned value
+   --> src\whp_mmio.rs:116:28
+    |
+116 |         let in_framebuffer=(a.gpa>=crate::framebuffer::GPA&&end<=(crate::framebuffer::GPA+crate::framebuffer::MAPPED_BYTES as u64));
+    |                            ^                                                                                                      ^
+    |
+    = note: `-D unused-parens` implied by `-D warnings`
+    = help: to override `-D warnings` add `#[allow(unused_parens)]`
+help: remove these parentheses
+    |
+116 -         let in_framebuffer=(a.gpa>=crate::framebuffer::GPA&&end<=(crate::framebuffer::GPA+crate::framebuffer::MAPPED_BYTES as u64));
+116 +         let in_framebuffer=a.gpa>=crate::framebuffer::GPA&&end<=(crate::framebuffer::GPA+crate::framebuffer::MAPPED_BYTES as u64);
+    |
 
-test result: FAILED. 185 passed; 1 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.58s
+error: unnecessary parentheses around assigned value
+   --> src\whp_mmio.rs:117:21
+    |
+117 |         let in_mmio=(a.gpa>=MMIO_BASE&&end<=MMIO_BASE+8*4096);
+    |                     ^                                       ^
+    |
+help: remove these parentheses
+    |
+117 -         let in_mmio=(a.gpa>=MMIO_BASE&&end<=MMIO_BASE+8*4096);
+117 +         let in_mmio=a.gpa>=MMIO_BASE&&end<=MMIO_BASE+8*4096;
+    |
 
-error: test failed, to rerun pass `--lib`
+error: could not compile `nexus-engine` (lib) due to 2 previous errors
+warning: build failed, waiting for other jobs to finish...
+error: could not compile `nexus-engine` (lib test) due to 2 previous errors
 
-::error::rsistence_latest_write_fallback_and_source_unchanged ... ok%0Atest virtio_block_tests::backend_errors_report_ioerr_without_publishing_read_payload ... ok%0Atest virtio_block_tests::device_write_to_readonly_ram_is_fatal_without_side_effects ... ok%0Atest virtio_block_tests::flush_two_descriptors_and_unused_sector ... ok%0Atest virtio_block_tests::malformed_chains_never_write_status_used_or_disk ... ok%0Atest virtio_block_tests::over_limit_transfer_is_ioerr_before_backend_io ... ok%0Atest virtio_block_tests::protocol_errors_complete_only_valid_status_without_backend_access ... ok%0Atest virtio_block_tests::queue_configuration_and_owned_index_tampering_refused ... ok%0Atest virtio_block_tests::read_scatter_buffers_status_and_used_lengths ... ok%0Atest sha256::tests::known_vectors_and_limit ... ok%0Atest virtio_block_tests::requests_crossing_a_ram_hole_fail_before_status_publication ... ok%0Atest virtio_block_tests::write_and_suppressed_interrupt_hint ... ok%0Atest virtio_mmio_tests::fatal_queue_fault_requires_reset_without_disk_or_status_write ... ok%0Atest virtio_mmio_tests::identity_selectors_config_byte_reads_and_access_shapes ... ok%0Atest virtio_mmio_tests::invalid_negotiation_clears_features_ok_and_reset_unlocks_features ... ok%0Atest virtio_mmio_tests::invalid_ring_gpa_is_checked_before_backend_and_demands_reset ... ok%0Atest virtio_mmio_tests::lifecycle_requires_features_and_ready_and_protects_live_queue ... ok%0Atest virtio_block_tests::readonly_backend_requires_verified_payload_and_refuses_writes ... ok%0Atest virtio_mmio_tests::ordinary_io_error_does_not_poison_device_and_suppression_is_honored ... ok%0Atest virtio_mmio_tests::read_completion_irq_latch_ack_and_no_repeat_io ... ok%0Atest virtio_mmio_tests::readonly_and_flush_feature_policy_enforced_before_backend ... ok%0Atest virtio_mmio_tests::service_budget_retains_pending_work_and_reasserts_after_ack ... ok%0Atest virtio_net::tests::loopback_round_trip_tx_then_rx ... ok%0Atest virtio_net::tests::rx_prepends_header_and_completes_with_total_length ... ok%0Atest virtio_net::tests::rx_returns_none_without_consuming_buffer_when_no_frame ... ok%0Atest virtio_net::tests::tx_rejects_short_packet_and_wrong_direction ... ok%0Atest virtio_net::tests::tx_strips_header_transmits_and_completes_with_status ... ok%0Atest virtio_net_mmio::tests::mac_config_is_readable_from_config_space ... ok%0Atest virtio_net_mmio::tests::notify_before_driver_ok_is_rejected ... ok%0Atest overlay::tests::wrong_base_and_header_refused_without_mutating_overlay ... ok%0Atest virtio_net_mmio::tests::rx_notify_service_delivers_loopback_frame ... ok%0Atest virtio_net_mmio::tests::status_negotiation_requires_ack_driver_features_then_ok ... ok%0Atest virtio_block_tests::actual_cow_backend_write_flush_reopen_and_base_preservation ... ok%0Atest virtio_net_mmio::tests::tx_notify_service_and_irq ... ok%0Atest virtqueue::tests::indices_wrap_without_replaying_or_losing_a_descriptor ... ok%0Atest virtio_mmio_tests::mmio_model_cow_write_flush_reset_reopen_read_preserves_base ... ok%0A%0Afailures:%0A%0A---- pic::tests::irq8_slave_cascade_delivery_and_ack stdout ----%0A%0Athread 'pic::tests::irq8_slave_cascade_delivery_and_ack' (3712) panicked at src\pic.rs:226:9:%0Aassertion `left == right` failed%0A  left: None%0A right: Some(34)%0Anote: run with `RUST_BACKTRACE=1` environment variable to display a backtrace%0A%0A%0Afailures:%0A    pic::tests::irq8_slave_cascade_delivery_and_ack%0A%0Atest result: FAILED. 185 passed; 1 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.58s%0A%0Aerror: test failed, to rerun pass `--lib`%0A
+::error::    Checking nexus-engine v0.1.0 (D:\a\scratch\scratch\rust\nexus-engine)%0Aerror: unnecessary parentheses around assigned value%0A   --> src\whp_mmio.rs:116:28%0A    |%0A116 |         let in_framebuffer=(a.gpa>=crate::framebuffer::GPA&&end<=(crate::framebuffer::GPA+crate::framebuffer::MAPPED_BYTES as u64));%0A    |                            ^                                                                                                      ^%0A    |%0A    = note: `-D unused-parens` implied by `-D warnings`%0A    = help: to override `-D warnings` add `#[allow(unused_parens)]`%0Ahelp: remove these parentheses%0A    |%0A116 -         let in_framebuffer=(a.gpa>=crate::framebuffer::GPA&&end<=(crate::framebuffer::GPA+crate::framebuffer::MAPPED_BYTES as u64));%0A116 +         let in_framebuffer=a.gpa>=crate::framebuffer::GPA&&end<=(crate::framebuffer::GPA+crate::framebuffer::MAPPED_BYTES as u64);%0A    |%0A%0Aerror: unnecessary parentheses around assigned value%0A   --> src\whp_mmio.rs:117:21%0A    |%0A117 |         let in_mmio=(a.gpa>=MMIO_BASE&&end<=MMIO_BASE+8*4096);%0A    |                     ^                                       ^%0A    |%0Ahelp: remove these parentheses%0A    |%0A117 -         let in_mmio=(a.gpa>=MMIO_BASE&&end<=MMIO_BASE+8*4096);%0A117 +         let in_mmio=a.gpa>=MMIO_BASE&&end<=MMIO_BASE+8*4096;%0A    |%0A%0Aerror: could not compile `nexus-engine` (lib) due to 2 previous errors%0Awarning: build failed, waiting for other jobs to finish...%0Aerror: could not compile `nexus-engine` (lib test) due to 2 previous errors%0A
 
 STDERR:
 
