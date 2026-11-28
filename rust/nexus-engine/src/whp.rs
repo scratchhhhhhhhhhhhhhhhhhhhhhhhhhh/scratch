@@ -471,7 +471,7 @@ mod windows {
     #[allow(clippy::too_many_arguments)]
     fn run_platform(partition:&Partition,platform:&mut crate::platform::EarlyPlatform,
         serial:&mut dyn std::io::Write,trace:&mut crate::timing::BootTrace,start:std::time::Instant,
-        run:(RunGoal,Option<(&Mapping<'_>,&crate::player::Session)>),mut disk:Option<&mut LiveBlock>,mut net:Option<&mut LiveNet>,mut audio:Option<&mut LiveAudio>,mut gpu:Option<&mut LiveGpu>)->Result<(),String> {
+        run:(RunGoal,Option<(&Mapping<'_>,&crate::player::Session)>),mut disk:Option<&mut LiveBlock>,mut net:Option<&mut LiveNet>,mut audio:Option<&mut LiveAudio>,mut gpu:Option<&mut LiveGpu>,mut null:Option<&mut LiveNull>)->Result<(),String> {
         let (goal,display)=run;let mut last_frame=std::time::Instant::now();
         let fixture=goal==RunGoal::TimerFixture;
         // Diagnostic wall budgets. Android/APK runs need room for CI scheduling variance;
@@ -547,8 +547,16 @@ mod windows {
                             if let Some(gpu)=gpu.as_mut() {
                                 if (MMIO_GPU_BASE..MMIO_GPU_BASE+4096).contains(&gpa) {gpu.access(&context)?;continue;}
                             }
-                            let disk=disk.as_mut().ok_or("Unmapped memory exit without a configured VirtIO device")?;
-                            disk.access(&context)?;
+                            if let Some(disk)=disk.as_mut() {
+                                if (MMIO_BASE..MMIO_BASE+4096).contains(&gpa) {disk.access(&context)?;continue;}
+                            }
+                            // Unmapped MMIO slot: route to the null device so the kernel's
+                            // virtio-mmio probe sees the "no device" magic and skips this slot.
+                            if (MMIO_BASE..MMIO_BASE+7*4096).contains(&gpa) {
+                                null.as_mut().ok_or("Unmapped MMIO slot without a null device")?.access(&context)?;
+                                continue;
+                            }
+                            return Err("Emulator memory access outside RAM/device page".into());
                         }
                         0x2001=>continue, // Scheduling rendezvous; wall deadline remains global.
                         8=>{
@@ -617,7 +625,9 @@ mod windows {
                 gpu=Some(LiveGpu{context:MmioContext{partition:partition.0,ram:memory.address.cast(),bytes:memory.bytes,
                     device:MmioDevice::Gpu(crate::virtio_gpu_mmio::GpuMmio::new()),error:None,translations:0,accesses:0},emulator:Emulator::new()?,backend:crate::virtio_gpu::ScanoutBackend{surface:crate::virtio_gpu::Surface{width:0,height:0,format:crate::virtio_gpu::FORMAT_XRGB8888,pitch:0,data:Vec::new()}}});
             }
-            run_platform(partition,&mut platform,serial,trace,start,(if plan.bridge_apk.is_some() {RunGoal::NativeApk} else if plan.bridge_home_check {RunGoal::AndroidHome} else if plan.bridge_probe {RunGoal::NativeBridge} else {RunGoal::Diagnostic},surface.zip(plan.player.as_deref())),None,net.as_mut(),audio.as_mut(),gpu.as_mut())
+            let mut null=LiveNull{context:MmioContext{partition:partition.0,ram:memory.address.cast(),bytes:memory.bytes,
+                device:MmioDevice::Null,error:None,translations:0,accesses:0},emulator:Emulator::new()?};
+            run_platform(partition,&mut platform,serial,trace,start,(if plan.bridge_apk.is_some() {RunGoal::NativeApk} else if plan.bridge_home_check {RunGoal::AndroidHome} else if plan.bridge_probe {RunGoal::NativeBridge} else {RunGoal::Diagnostic},surface.zip(plan.player.as_deref())),None,net.as_mut(),audio.as_mut(),gpu.as_mut(),Some(&mut null))
         })
     }
     pub fn boot_kernel_disk(plan:&crate::kernel::KernelPlan,serial:&mut dyn std::io::Write,trace:&mut crate::timing::BootTrace,start:std::time::Instant,base:&std::path::Path,cow:&std::path::Path,create:bool)->Result<(),String> {
@@ -648,7 +658,9 @@ mod windows {
                 gpu=Some(LiveGpu{context:MmioContext{partition:partition.0,ram:memory.address.cast(),bytes:memory.bytes,
                     device:MmioDevice::Gpu(crate::virtio_gpu_mmio::GpuMmio::new()),error:None,translations:0,accesses:0},emulator:Emulator::new()?,backend:crate::virtio_gpu::ScanoutBackend{surface:crate::virtio_gpu::Surface{width:0,height:0,format:crate::virtio_gpu::FORMAT_XRGB8888,pitch:0,data:Vec::new()}}});
             }
-            run_platform(partition,&mut platform,serial,trace,start,(if plan.bridge_apk.is_some() {RunGoal::NativeApk} else if plan.bridge_home_check {RunGoal::AndroidHome} else if plan.bridge_probe {RunGoal::NativeBridge} else if plan.android_observe {RunGoal::AndroidObserve} else if plan.android_init_probe {RunGoal::AndroidInit} else {RunGoal::Diagnostic},surface.zip(plan.player.as_deref())),Some(&mut disk),net.as_mut(),audio.as_mut(),gpu.as_mut())
+            let mut null=LiveNull{context:MmioContext{partition:partition.0,ram:memory.address.cast(),bytes:memory.bytes,
+                device:MmioDevice::Null,error:None,translations:0,accesses:0},emulator:Emulator::new()?};
+            run_platform(partition,&mut platform,serial,trace,start,(if plan.bridge_apk.is_some() {RunGoal::NativeApk} else if plan.bridge_home_check {RunGoal::AndroidHome} else if plan.bridge_probe {RunGoal::NativeBridge} else if plan.android_observe {RunGoal::AndroidObserve} else if plan.android_init_probe {RunGoal::AndroidInit} else {RunGoal::Diagnostic},surface.zip(plan.player.as_deref())),Some(&mut disk),net.as_mut(),audio.as_mut(),gpu.as_mut(),Some(&mut null))
         })
     }
     pub fn ata_pio_smoke(path:&std::path::Path)->Result<(),String> {ata_fixture(path,None)}
@@ -851,7 +863,7 @@ mod windows {
             platform.pit0.access(0x43,true,control,0)?;
             platform.pit0.access(0x40,true,0,0)?;platform.pit0.access(0x40,true,0,0)?;
             let mut trace=crate::timing::BootTrace::default();let start=std::time::Instant::now();
-            run_platform(partition,&mut platform,&mut std::io::sink(),&mut trace,start,(RunGoal::TimerFixture,None),None,None,None,None)?;
+            run_platform(partition,&mut platform,&mut std::io::sink(),&mut trace,start,(RunGoal::TimerFixture,None),None,None,None,None,None)?;
             let count=unsafe {std::ptr::read_unaligned(memory.address.cast::<u8>().add(cpu::INTERRUPT_COUNT).cast::<u32>())};
             if count!=1||trace.irq0_injections!=1||trace.halt_waits!=1||scalar_register(partition,4)?!=cpu::STACK {
                 return Err(format!("Timer IRQ/HLT/IRETD mismatch count={count}, trace={}",trace.json()));

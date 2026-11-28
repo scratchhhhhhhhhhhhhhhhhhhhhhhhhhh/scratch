@@ -54,12 +54,16 @@ enum MmioDevice {
     Spi(crate::spi::SpiController),
     #[allow(dead_code)]
     Gpu(crate::virtio_gpu_mmio::GpuMmio),
+    /// Absent device: returns the VirtIO "no device" magic (0xFFFFFFFF) for
+    /// device-ID reads so the kernel's virtio-mmio probe fails gracefully and
+    /// skips this slot instead of crashing the VM.
+    Null,
 }
 impl MmioDevice {
-    fn read(&self,offset:u64,size:u8)->Result<u32,String> {match self {MmioDevice::Block(d)=>d.read(offset,size),MmioDevice::Net(d)=>d.read(offset,size),MmioDevice::Audio(d)=>d.read(offset,size),MmioDevice::Gpio(d)=>d.read(offset,size),MmioDevice::I2c(d)=>d.read(offset,size),MmioDevice::Spi(d)=>d.read(offset,size),MmioDevice::Gpu(d)=>d.read(offset,size)}}
-    fn write(&mut self,offset:u64,size:u8,value:u32)->Result<(),String> {match self {MmioDevice::Block(d)=>d.write(offset,size,value),MmioDevice::Net(d)=>d.write(offset,size,value),MmioDevice::Audio(d)=>d.write(offset,size,value),MmioDevice::Gpio(d)=>d.write(offset,size,value),MmioDevice::I2c(d)=>d.write(offset,size,value),MmioDevice::Spi(d)=>d.write(offset,size,value),MmioDevice::Gpu(d)=>d.write(offset,size,value)}}
-    fn work_pending(&self)->bool {match self {MmioDevice::Block(d)=>d.work_pending(),MmioDevice::Net(d)=>d.work_pending(),MmioDevice::Audio(d)=>d.work_pending(),MmioDevice::Gpio(d)=>d.work_pending(),MmioDevice::I2c(d)=>d.work_pending(),MmioDevice::Spi(d)=>d.work_pending(),MmioDevice::Gpu(d)=>d.work_pending()}}
-    fn irq_asserted(&self)->bool {match self {MmioDevice::Block(d)=>d.irq_asserted(),MmioDevice::Net(d)=>d.irq_asserted(),MmioDevice::Audio(d)=>d.irq_asserted(),MmioDevice::Gpio(d)=>d.irq_asserted(),MmioDevice::I2c(d)=>d.irq_asserted(),MmioDevice::Spi(d)=>d.irq_asserted(),MmioDevice::Gpu(d)=>d.irq_asserted()}}
+    fn read(&self,offset:u64,size:u8)->Result<u32,String> {match self {MmioDevice::Block(d)=>d.read(offset,size),MmioDevice::Net(d)=>d.read(offset,size),MmioDevice::Audio(d)=>d.read(offset,size),MmioDevice::Gpio(d)=>d.read(offset,size),MmioDevice::I2c(d)=>d.read(offset,size),MmioDevice::Spi(d)=>d.read(offset,size),MmioDevice::Gpu(d)=>d.read(offset,size),MmioDevice::Null=>Ok(0xFFFF_FFFF)}}
+    fn write(&mut self,offset:u64,size:u8,value:u32)->Result<(),String> {match self {MmioDevice::Block(d)=>d.write(offset,size,value),MmioDevice::Net(d)=>d.write(offset,size,value),MmioDevice::Audio(d)=>d.write(offset,size,value),MmioDevice::Gpio(d)=>d.write(offset,size,value),MmioDevice::I2c(d)=>d.write(offset,size,value),MmioDevice::Spi(d)=>d.write(offset,size,value),MmioDevice::Gpu(d)=>d.write(offset,size,value),MmioDevice::Null=>Ok(())}}
+    fn work_pending(&self)->bool {match self {MmioDevice::Block(d)=>d.work_pending(),MmioDevice::Net(d)=>d.work_pending(),MmioDevice::Audio(d)=>d.work_pending(),MmioDevice::Gpio(d)=>d.work_pending(),MmioDevice::I2c(d)=>d.work_pending(),MmioDevice::Spi(d)=>d.work_pending(),MmioDevice::Gpu(d)=>d.work_pending(),MmioDevice::Null=>false}}
+    fn irq_asserted(&self)->bool {match self {MmioDevice::Block(d)=>d.irq_asserted(),MmioDevice::Net(d)=>d.irq_asserted(),MmioDevice::Audio(d)=>d.irq_asserted(),MmioDevice::Gpio(d)=>d.irq_asserted(),MmioDevice::I2c(d)=>d.irq_asserted(),MmioDevice::Spi(d)=>d.irq_asserted(),MmioDevice::Gpu(d)=>d.irq_asserted(),MmioDevice::Null=>false}}
 }
 struct MmioContext {
     partition:*mut c_void,ram:*mut u8,bytes:usize,device:MmioDevice,
@@ -246,6 +250,18 @@ impl LiveGpu {
                 device.service(&mut memory,&mut self.backend,256)?;
             }
         }
+        Ok(())
+    }
+}
+
+/// Live null device: services MMIO accesses to slots without a configured
+/// VirtIO device by returning the "no device" magic (0xFFFFFFFF). This lets
+/// the kernel's virtio-mmio probe fail gracefully instead of crashing the VM
+/// when it scans multiple MMIO slots (e.g. virtio_mmio.device=4K@base:7).
+struct LiveNull {context:MmioContext,emulator:Emulator}
+impl LiveNull {
+    fn access(&mut self,exit:&ExitContext)->Result<(),String> {
+        self.emulator.emulate(&mut self.context,exit,false)?;
         Ok(())
     }
 }
