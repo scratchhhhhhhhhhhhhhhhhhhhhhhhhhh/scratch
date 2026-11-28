@@ -112,8 +112,18 @@ extern "system" fn emu_memory(context:*mut c_void,access:*mut EmulatorMemory)->i
             let ram=unsafe {std::slice::from_raw_parts_mut(ctx.ram.add(a.gpa as usize),n)};
             if a.direction==0 {a.data[..n].copy_from_slice(ram);} else {ram.copy_from_slice(&a.data[..n]);}return Ok(());
         }
-        if !((a.gpa>=MMIO_BASE&&end<=MMIO_BASE+4096)||(a.gpa>=MMIO_NET_BASE&&end<=MMIO_NET_BASE+4096)||(a.gpa>=MMIO_AUDIO_BASE&&end<=MMIO_AUDIO_BASE+4096)||(a.gpa>=MMIO_GPIO_BASE&&end<=MMIO_GPIO_BASE+4096)||(a.gpa>=MMIO_I2C_BASE&&end<=MMIO_I2C_BASE+4096)||(a.gpa>=MMIO_SPI_BASE&&end<=MMIO_SPI_BASE+4096)||(a.gpa>=MMIO_GPU_BASE&&end<=MMIO_GPU_BASE+4096)) {return Err("Emulator memory access outside RAM/device page".into());}
-        if ![1,2,4].contains(&a.size) {return Err("Unsupported MMIO register access width".into());}
+        let in_ram=end<=ctx.bytes as u64;
+        let in_framebuffer=(a.gpa>=crate::framebuffer::GPA&&end<=(crate::framebuffer::GPA+crate::framebuffer::MAPPED_BYTES as u64));
+        let in_mmio=(a.gpa>=MMIO_BASE&&end<=MMIO_BASE+8*4096);
+        if !in_ram&&!in_framebuffer&&!in_mmio {return Err(format!("Emulator memory access outside RAM/device page at gpa=0x{:x}",a.gpa));}
+        if !in_ram&&![1,2,4].contains(&a.size) {return Err("Unsupported MMIO register access width".into());}
+        // Framebuffer region without a --framebuffer plan: return 0xFFFFFFFF
+        // for reads, ignore writes, so a DRM-enabled kernel probing fbdev
+        // memory does not crash the VM.
+        if in_framebuffer {
+            if a.direction==0 {a.data[..n].copy_from_slice(&0xFFFF_FFFFu32.to_le_bytes()[..n]);}
+            ctx.accesses+=1;return Ok(());
+        }
         let offset=if a.gpa>=MMIO_GPU_BASE {a.gpa-MMIO_GPU_BASE} else if a.gpa>=MMIO_SPI_BASE {a.gpa-MMIO_SPI_BASE} else if a.gpa>=MMIO_I2C_BASE {a.gpa-MMIO_I2C_BASE} else if a.gpa>=MMIO_GPIO_BASE {a.gpa-MMIO_GPIO_BASE} else if a.gpa>=MMIO_AUDIO_BASE {a.gpa-MMIO_AUDIO_BASE} else if a.gpa>=MMIO_NET_BASE {a.gpa-MMIO_NET_BASE} else {a.gpa-MMIO_BASE};
         if a.direction==0 {let value=ctx.device.read(offset,a.size)?.to_le_bytes();a.data[..n].copy_from_slice(&value[..n]);}
         else {

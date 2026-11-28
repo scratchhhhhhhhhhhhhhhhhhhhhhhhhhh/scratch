@@ -550,13 +550,14 @@ mod windows {
                             if let Some(disk)=disk.as_mut() {
                                 if (MMIO_BASE..MMIO_BASE+4096).contains(&gpa) {disk.access(&context)?;continue;}
                             }
-                            // Unmapped MMIO slot: route to the null device so the kernel's
-                            // virtio-mmio probe sees the "no device" magic and skips this slot.
-                            if (MMIO_BASE..MMIO_BASE+7*4096).contains(&gpa) {
-                                null.as_mut().ok_or("Unmapped MMIO slot without a null device")?.access(&context)?;
+                            // Unmapped MMIO or framebuffer slot: route to the null device so the
+                            // kernel's virtio-mmio probe and fbdev access see the "no device"
+                            // magic and skip these slots gracefully.
+                            if (MMIO_BASE..MMIO_BASE+8*4096).contains(&gpa) || (crate::framebuffer::GPA..crate::framebuffer::GPA+crate::framebuffer::MAPPED_BYTES as u64).contains(&gpa) {
+                                null.as_mut().ok_or("Unmapped MMIO/framebuffer slot without a null device")?.access(&context)?;
                                 continue;
                             }
-                            return Err("Emulator memory access outside RAM/device page".into());
+                            return Err(format!("Emulator memory access outside RAM/device page at gpa=0x{gpa:x}"));
                         }
                         0x2001=>continue, // Scheduling rendezvous; wall deadline remains global.
                         8=>{
