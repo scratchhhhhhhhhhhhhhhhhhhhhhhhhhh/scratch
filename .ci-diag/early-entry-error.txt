@@ -1,97 +1,7 @@
 === gpu-checkpoint.json ===
-{
-  "verified": false,
-  "samples": [
-    {
-      "sample": 1,
-      "engine_exit": 1,
-      "stderr": "Starting experimental Linux entry at 0x100000; polled serial log: gpu-serial-1.log. Full kernel/platform boot is NOT implemented.\nNexus native engine: Unmapped memory exit without a configured VirtIO device\n",
-      "serial_tail": "e_ns: 7645519600211568 ns\nKernel command line: earlyprintk=serial,ttyS0,115200 console=ttyS0,115200 nokaslr noapic nolapic acpi=off pci=off maxcpus=1 panic=-1 virtio_mmio.device=4K@0xd0000000:7 tsc_early_khz=2445428\nUnknown kernel command line parameters \"nokaslr acpi=off pci=off maxcpus=1\", will be passed to user space.\nrandom: crng init done\nDentry cache hash table entries: 32768 (order: 6, 262144 bytes, linear)\nInode-cache hash table entries: 16384 (order: 5, 131072 bytes, linear)\nBuilt 1 zonelists, mobility grouping on.  Total pages: 64256\nmem auto-init: stack:all(zero), heap alloc:off, heap free:off\nMemory: 246040K/261752K available (6144K kernel code, 774K rwdata, 456K rodata, 516K init, 752K bss, 15456K reserved, 0K cma-reserved)\nSLUB: HWalign=64, Order=0-1, MinObjects=0, CPUs=1, Nodes=1\nNR_IRQS: 4352, nr_irqs: 24, preallocated irqs: 16\nConsole: colour dummy device 80x25\nprintk: console [ttyS0] enabled\nprintk: console [ttyS0] enabled\nprintk: bootconsole [earlyser0] disabled\nprintk: bootconsole [earlyser0] disabled\nAPIC disabled via kernel command line\nAPIC: Keep in PIC mode(8259)\nclocksource: tsc-early: mask: 0xffffffffffffffff max_cycles: 0x233fd98c0cf, max_idle_ns: 440795209930 ns\nCalibrating delay loop (skipped), value calculated using timer frequency.. 4890.85 BogoMIPS (lpj=9781712)\nLast level iTLB entries: 4KB 512, 2MB 512, 4MB 256\nLast level dTLB entries: 4KB 2048, 2MB 2048, 4MB 1024, 1GB 0\nCPU: AMD EPYC 7763 64-Core Processor (family: 0x19, model: 0x1, stepping: 0x1)\nSpectre V1 : Mitigation: usercopy/swapgs barriers and __user pointer sanitization\nSpectre V2 : Kernel not compiled with retpoline; no mitigation available!\nSpectre V2 : Vulnerable\nSpectre V2 : Spectre v2 / SpectreRSB mitigation: Filling RSB on context switch\nSpeculative Store Bypass: Vulnerable\nSpeculative Return Stack Overflow: IBPB-extending microcode not applied!\nSpeculative Return Stack Overflow: WARNING: See https://kernel.org/doc/html/latest/admin-guide/hw-vuln/srso.html for mitigation options.\nSpeculative Return Stack Overflow: WARNING: kernel not compiled with CPU_SRSO.\nx86/fpu: Supporting XSAVE feature 0x001: 'x87 floating point registers'\nx86/fpu: Supporting XSAVE feature 0x002: 'SSE registers'\nx86/fpu: Supporting XSAVE feature 0x004: 'AVX registers'\nx86/fpu: Supporting XSAVE feature 0x800: 'Control-flow User registers'\nx86/fpu: xstate_offset[2]:  576, xstate_sizes[2]:  256\nx86/fpu: xstate_offset[11]:  832, xstate_sizes[11]:   16\nx86/fpu: Enabled xstate features 0x807, context size is 848 bytes, using 'compacted' format.\npid_max: default: 4096 minimum: 301\nMount-cache hash table entries: 512 (order: 0, 4096 bytes, linear)\nMountpoint-cache hash table entries: 512 (order: 0, 4096 bytes, linear)\nPerformance Events: \nno APIC, boot with the \"lapic\" boot parameter to force-enable it.\nno hardware sampling interrupt available.\nBroken PMU hardware detected, using software events only.\nFailed to access perfctr msr (MSR c0010000 is ffffffffffffffff)\nsignal: max sigframe size: 1360\ndevtmpfs: initialized\nclocksource: jiffies: mask: 0xffffffff max_cycles: 0xffffffff, max_idle_ns: 7645041785100000 ns\nclocksource: Switched to clocksource tsc-early\nvirtio-mmio: Registering device virtio-mmio.0 at 0xd0000000-0xd0000fff, IRQ 7.\nplatform rtc_cmos: registered platform RTC device (no PNP device found)\nUnpacking initramfs...\nFreeing initrd memory: 4K\nworkingset: timestamp_bits=62 max_order=16 bucket_order=0\nio scheduler mq-deadline registered\nio scheduler kyber registered\n",
-      "metrics": {
-        "schema": 1,
-        "clock": "host_monotonic",
-        "origin": "engine_main_including_input_load",
-        "android_home_target_ms": 100000,
-        "android_home_ready_ms": null,
-        "total_boot_verified": false,
-        "target_met": null,
-        "header_validated_ms": 1,
-        "vm_ready_ms": 5,
-        "vcpu_run_requested_ms": 5,
-        "linux_banner_ms": 226,
-        "linux_userspace_ready_ms": null,
-        "android_init_second_stage_ms": null,
-        "stopped_ms": 468,
-        "vcpu_exits": 11910,
-        "pit_channel2_programs": 1,
-        "pit_accesses": 19,
-        "pic_accesses": 24,
-        "pic_initializations": 2,
-        "pit0_programs": 1,
-        "pit0_edges": 20,
-        "irq0_injections": 2,
-        "irq3_injections": 0,
-        "irq4_injections": 0,
-        "irq5_injections": 0,
-        "halt_waits": 0,
-        "serial_bytes": 5723,
-        "renderer": "software",
-        "stop_reason": "Unmapped memory exit without a configured VirtIO device"
-      },
-      "stdout": ""
-    }
-  ]
-}=== gpu-serial-1.log (tail) ===
-mem auto-init: stack:all(zero), heap alloc:off, heap free:off
-Memory: 246040K/261752K available (6144K kernel code, 774K rwdata, 456K rodata, 516K init, 752K bss, 15456K reserved, 0K cma-reserved)
-SLUB: HWalign=64, Order=0-1, MinObjects=0, CPUs=1, Nodes=1
-NR_IRQS: 4352, nr_irqs: 24, preallocated irqs: 16
-Console: colour dummy device 80x25
-printk: console [ttyS0] enabled
-printk: console [ttyS0] enabled
-printk: bootconsole [earlyser0] disabled
-printk: bootconsole [earlyser0] disabled
-APIC disabled via kernel command line
-APIC: Keep in PIC mode(8259)
-clocksource: tsc-early: mask: 0xffffffffffffffff max_cycles: 0x233fd98c0cf, max_idle_ns: 440795209930 ns
-Calibrating delay loop (skipped), value calculated using timer frequency.. 4890.85 BogoMIPS (lpj=9781712)
-Last level iTLB entries: 4KB 512, 2MB 512, 4MB 256
-Last level dTLB entries: 4KB 2048, 2MB 2048, 4MB 1024, 1GB 0
-CPU: AMD EPYC 7763 64-Core Processor (family: 0x19, model: 0x1, stepping: 0x1)
-Spectre V1 : Mitigation: usercopy/swapgs barriers and __user pointer sanitization
-Spectre V2 : Kernel not compiled with retpoline; no mitigation available!
-Spectre V2 : Vulnerable
-Spectre V2 : Spectre v2 / SpectreRSB mitigation: Filling RSB on context switch
-Speculative Store Bypass: Vulnerable
-Speculative Return Stack Overflow: IBPB-extending microcode not applied!
-Speculative Return Stack Overflow: WARNING: See https://kernel.org/doc/html/latest/admin-guide/hw-vuln/srso.html for mitigation options.
-Speculative Return Stack Overflow: WARNING: kernel not compiled with CPU_SRSO.
-x86/fpu: Supporting XSAVE feature 0x001: 'x87 floating point registers'
-x86/fpu: Supporting XSAVE feature 0x002: 'SSE registers'
-x86/fpu: Supporting XSAVE feature 0x004: 'AVX registers'
-x86/fpu: Supporting XSAVE feature 0x800: 'Control-flow User registers'
-x86/fpu: xstate_offset[2]:  576, xstate_sizes[2]:  256
-x86/fpu: xstate_offset[11]:  832, xstate_sizes[11]:   16
-x86/fpu: Enabled xstate features 0x807, context size is 848 bytes, using 'compacted' format.
-pid_max: default: 4096 minimum: 301
-Mount-cache hash table entries: 512 (order: 0, 4096 bytes, linear)
-Mountpoint-cache hash table entries: 512 (order: 0, 4096 bytes, linear)
-Performance Events: 
-no APIC, boot with the "lapic" boot parameter to force-enable it.
-no hardware sampling interrupt available.
-Broken PMU hardware detected, using software events only.
-Failed to access perfctr msr (MSR c0010000 is ffffffffffffffff)
-signal: max sigframe size: 1360
-devtmpfs: initialized
-clocksource: jiffies: mask: 0xffffffff max_cycles: 0xffffffff, max_idle_ns: 7645041785100000 ns
-clocksource: Switched to clocksource tsc-early
-virtio-mmio: Registering device virtio-mmio.0 at 0xd0000000-0xd0000fff, IRQ 7.
-platform rtc_cmos: registered platform RTC device (no PNP device found)
-Unpacking initramfs...
-Freeing initrd memory: 4K
-workingset: timestamp_bits=62 max_order=16 bucket_order=0
-io scheduler mq-deadline registered
-io scheduler kyber registered
+not found
+=== gpu-serial-1.log (tail) ===
+not found
 === display-checkpoint.json ===
 not found
 === display-diag.txt ===
@@ -104,17 +14,17 @@ not found
     "sample": 1,
     "kind": "first_process_launch",
     "host_cache_state": "uncontrolled; NOT a cold-cache measurement",
-    "engine_exit": 0,
+    "engine_exit": 1,
     "ram_mib": 256,
     "virtio_disk_enabled": true,
     "virtio_expected_operation": "write_fsync_read",
-    "launch_to_engine_exit_ms": 736.6331,
+    "launch_to_engine_exit_ms": 656.0668,
     "full_boot_verified": false,
-    "kernel_sha256": "65ee5652a5fc88ad6430f0d60338a65793c0e18ae8d68b898a9b02719a095a2b",
+    "kernel_sha256": "6cb7cd4f720c1fdd0b4f08aeae6ce519f1a10b8fd06f2815550c7ac83beed6c8",
     "initramfs_sha256": "43dc410d29490c3aba77eca19526fbb5ea8df317d1379eac61e5eaf935313e77",
-    "serial_sha256": "1abc285f993d3002b4f237d4078cb77563ba91653289114aaea4fb3493786205",
-    "serial_bytes": 6526,
-    "stderr": "Starting experimental Linux entry at 0x100000; polled serial log: kernel-serial.log. Full kernel/platform boot is NOT implemented.\n",
+    "serial_sha256": "dff2c9df4f0e13a1c5418fc7a9e7f6170d58916039370dc88cfdbbf3774ad6ad",
+    "serial_bytes": 5564,
+    "stderr": "Starting experimental Linux entry at 0x100000; polled serial log: kernel-serial.log. Full kernel/platform boot is NOT implemented.\nNexus native engine: Emulator memory access outside RAM/device page\n",
     "metrics": {
       "schema": 1,
       "clock": "host_monotonic",
@@ -124,121 +34,27 @@ not found
       "total_boot_verified": false,
       "target_met": null,
       "header_validated_ms": 1,
-      "vm_ready_ms": 23,
-      "vcpu_run_requested_ms": 24,
-      "linux_banner_ms": 244,
-      "linux_userspace_ready_ms": 720,
+      "vm_ready_ms": 24,
+      "vcpu_run_requested_ms": 25,
+      "linux_banner_ms": 254,
+      "linux_userspace_ready_ms": null,
       "android_init_second_stage_ms": null,
-      "stopped_ms": 726,
-      "vcpu_exits": 14115,
+      "stopped_ms": 647,
+      "vcpu_exits": 11704,
       "pit_channel2_programs": 1,
-      "pit_accesses": 19,
-      "pic_accesses": 295,
+      "pit_accesses": 13,
+      "pic_accesses": 29,
       "pic_initializations": 2,
       "pit0_programs": 1,
-      "pit0_edges": 85,
-      "irq0_injections": 64,
+      "pit0_edges": 41,
+      "irq0_injections": 3,
       "irq3_injections": 0,
-      "irq4_injections": 1,
-      "irq5_injections": 4,
-      "halt_waits": 53,
-      "serial_bytes": 6526,
+      "irq4_injections": 0,
+      "irq5_injections": 0,
+      "halt_waits": 0,
+      "serial_bytes": 5564,
       "renderer": "software",
-      "stop_reason": "Linux diagnostic userspace checkpoint reached; Android boot not implemented"
-    }
-  },
-  {
-    "sample": 2,
-    "kind": "repeat_process_launch",
-    "host_cache_state": "uncontrolled; NOT a cold-cache measurement",
-    "engine_exit": 0,
-    "ram_mib": 512,
-    "virtio_disk_enabled": true,
-    "virtio_expected_operation": "separate_boot_read",
-    "launch_to_engine_exit_ms": 806.0441,
-    "full_boot_verified": false,
-    "kernel_sha256": "65ee5652a5fc88ad6430f0d60338a65793c0e18ae8d68b898a9b02719a095a2b",
-    "initramfs_sha256": "a8f5bae24dc846420891792ab112bdb694076bcf4652898951c49823a8f59456",
-    "serial_sha256": "a58552b351bb2bc2c30ec062e3b89a5850d15926ea12cbdcaa1619d339f695b2",
-    "serial_bytes": 6524,
-    "stderr": "Starting experimental Linux entry at 0x100000; polled serial log: kernel-serial-2.log. Full kernel/platform boot is NOT implemented.\n",
-    "metrics": {
-      "schema": 1,
-      "clock": "host_monotonic",
-      "origin": "engine_main_including_input_load",
-      "android_home_target_ms": 100000,
-      "android_home_ready_ms": null,
-      "total_boot_verified": false,
-      "target_met": null,
-      "header_validated_ms": 1,
-      "vm_ready_ms": 14,
-      "vcpu_run_requested_ms": 14,
-      "linux_banner_ms": 270,
-      "linux_userspace_ready_ms": 784,
-      "android_init_second_stage_ms": null,
-      "stopped_ms": 794,
-      "vcpu_exits": 14128,
-      "pit_channel2_programs": 1,
-      "pit_accesses": 19,
-      "pic_accesses": 287,
-      "pic_initializations": 2,
-      "pit0_programs": 1,
-      "pit0_edges": 85,
-      "irq0_injections": 64,
-      "irq3_injections": 0,
-      "irq4_injections": 1,
-      "irq5_injections": 2,
-      "halt_waits": 53,
-      "serial_bytes": 6524,
-      "renderer": "software",
-      "stop_reason": "Linux diagnostic userspace checkpoint reached; Android boot not implemented"
-    }
-  },
-  {
-    "sample": 3,
-    "kind": "repeat_process_launch",
-    "host_cache_state": "uncontrolled; NOT a cold-cache measurement",
-    "engine_exit": 0,
-    "ram_mib": 1024,
-    "virtio_disk_enabled": true,
-    "virtio_expected_operation": "separate_boot_read",
-    "launch_to_engine_exit_ms": 843.2375,
-    "full_boot_verified": false,
-    "kernel_sha256": "65ee5652a5fc88ad6430f0d60338a65793c0e18ae8d68b898a9b02719a095a2b",
-    "initramfs_sha256": "a8f5bae24dc846420891792ab112bdb694076bcf4652898951c49823a8f59456",
-    "serial_sha256": "283f9b4c77c59817bd96eea268ebeba340742a8b31127e5bc40a84f9043f208b",
-    "serial_bytes": 6530,
-    "stderr": "Starting experimental Linux entry at 0x100000; polled serial log: kernel-serial-3.log. Full kernel/platform boot is NOT implemented.\n",
-    "metrics": {
-      "schema": 1,
-      "clock": "host_monotonic",
-      "origin": "engine_main_including_input_load",
-      "android_home_target_ms": 100000,
-      "android_home_ready_ms": null,
-      "total_boot_verified": false,
-      "target_met": null,
-      "header_validated_ms": 1,
-      "vm_ready_ms": 17,
-      "vcpu_run_requested_ms": 17,
-      "linux_banner_ms": 244,
-      "linux_userspace_ready_ms": 813,
-      "android_init_second_stage_ms": null,
-      "stopped_ms": 832,
-      "vcpu_exits": 14160,
-      "pit_channel2_programs": 1,
-      "pit_accesses": 19,
-      "pic_accesses": 287,
-      "pic_initializations": 2,
-      "pit0_programs": 1,
-      "pit0_edges": 86,
-      "irq0_injections": 64,
-      "irq3_injections": 0,
-      "irq4_injections": 1,
-      "irq5_injections": 2,
-      "halt_waits": 53,
-      "serial_bytes": 6530,
-      "renderer": "software",
-      "stop_reason": "Linux diagnostic userspace checkpoint reached; Android boot not implemented"
+      "stop_reason": "Emulator memory access outside RAM/device page"
     }
   }
 ]
