@@ -141,6 +141,26 @@ jobs:
         run: |
           import runpy
           runpy.run_path('tests/native_gpu_checkpoint.py',run_name='__main__')
+      - name: Capture early-entry failure diagnostics
+        if: failure()
+        shell: bash
+        run: |
+          mkdir -p .ci-diag
+          {
+            echo "=== gpu-checkpoint.json ==="
+            cat gpu-checkpoint.json 2>/dev/null || echo "not found"
+            echo "=== gpu-serial-1.log (tail) ==="
+            tail -50 gpu-serial-1.log 2>/dev/null || echo "not found"
+            echo "=== display-checkpoint.json ==="
+            cat display-checkpoint.json 2>/dev/null || echo "not found"
+            echo "=== kernel-checkpoint.txt ==="
+            cat kernel-checkpoint.txt 2>/dev/null || echo "not found"
+          } > .ci-diag/early-entry-error.txt
+          git config user.email "ci@nexus.local"
+          git config user.name "CI Diagnostics"
+          git add .ci-diag
+          git commit -q -m "ci-diag: native-kernel early-entry failure output" || true
+          git push -q origin HEAD 2>/dev/null || true
       - name: Verify ext4 clean and unclean-VM persistence evidence
         shell: python
         run: |
