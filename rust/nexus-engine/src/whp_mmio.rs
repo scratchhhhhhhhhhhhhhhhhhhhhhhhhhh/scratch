@@ -113,8 +113,8 @@ extern "system" fn emu_memory(context:*mut c_void,access:*mut EmulatorMemory)->i
             if a.direction==0 {a.data[..n].copy_from_slice(ram);} else {ram.copy_from_slice(&a.data[..n]);}return Ok(());
         }
         let in_ram=end<=ctx.bytes as u64;
-        let in_framebuffer=(a.gpa>=crate::framebuffer::GPA&&end<=(crate::framebuffer::GPA+crate::framebuffer::MAPPED_BYTES as u64));
-        let in_mmio=(a.gpa>=MMIO_BASE&&end<=MMIO_BASE+8*4096);
+        let in_framebuffer=a.gpa>=crate::framebuffer::GPA&&end<=(crate::framebuffer::GPA+crate::framebuffer::MAPPED_BYTES as u64);
+        let in_mmio=a.gpa>=MMIO_BASE&&end<=MMIO_BASE+8*4096;
         if !in_ram&&!in_framebuffer&&!in_mmio {return Err(format!("Emulator memory access outside RAM/device page at gpa=0x{:x}",a.gpa));}
         if !in_ram&&![1,2,4].contains(&a.size) {return Err("Unsupported MMIO register access width".into());}
         // Framebuffer region without a --framebuffer plan: return 0xFFFFFFFF
