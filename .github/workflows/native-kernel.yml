@@ -117,6 +117,11 @@ jobs:
         run: |
           import runpy
           runpy.run_path('tests/native_display_checkpoint.py',run_name='__main__')
+      - name: Verify guest virtio-gpu DRM device discovery and DRM_IOCTL_VERSION
+        shell: python
+        run: |
+          import runpy
+          runpy.run_path('tests/native_gpu_checkpoint.py',run_name='__main__')
       - name: Verify ext4 clean and unclean-VM persistence evidence
         shell: python
         run: |
@@ -156,6 +161,10 @@ jobs:
             display-serial*.log
             display-serial*.timing.json
             display-initramfs.cpio
+            gpu-checkpoint.json
+            gpu-initramfs.cpio
+            gpu-serial*.log
+            gpu-serial*.timing.json
             boot-timing-summary.json
             kernel-checkpoint.txt
             native-engine-*.log

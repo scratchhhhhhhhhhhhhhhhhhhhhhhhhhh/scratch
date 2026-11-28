@@ -124,6 +124,21 @@ class FixtureTests(unittest.TestCase):
         self.assertEqual(struct.unpack_from('<I',blob,68)[0],7)
         self.assertEqual(unpack_archive(initramfs(display=True))['init'][1],blob)
 
+    def test_gpu_fixture_opens_drm_device_and_runs_version_ioctl(self):
+        blob=init_elf(gpu=True)
+        self.assertIn(b'/dev/dri/card0\x00',blob)
+        self.assertIn(b'\xbe\x00\x44\x0c\xc0',blob)  # DRM_IOCTL_VERSION=0xC00C4400
+        self.assertIn(b'\x8b\x3b',blob)  # mov edi,[r11] drm_major readback
+        self.assertIn(b'\x85\xff',blob)  # test edi,edi
+        self.assertIn(b'NEXUS_DRM_VIRTIO_GPU_VERSION_OK\n',blob)
+        self.assertEqual(struct.unpack_from('<I',blob,68)[0],7)
+        self.assertEqual(unpack_archive(initramfs(gpu=True))['init'][1],blob)
+        # GPU + display combined must not duplicate devdir/devfs labels.
+        combined=init_elf(display=True,gpu=True)
+        self.assertIn(b'NEXUS_FB0_PATTERN_WRITTEN\n',combined)
+        self.assertIn(b'NEXUS_DRM_VIRTIO_GPU_VERSION_OK\n',combined)
+        self.assertEqual(unpack_archive(initramfs(display=True,gpu=True))['init'][1],combined)
+
     def test_unclean_stop_does_not_unmount_but_still_fsyncs(self):
         clean = init_elf(True, True, True)
         unclean = init_elf(True, True, False)
